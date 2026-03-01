@@ -1,0 +1,4 @@
+.env
+.htpasswd
+note-app-frontend/
+note-app-backend/
