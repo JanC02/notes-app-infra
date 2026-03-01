@@ -8,7 +8,7 @@ services:
       POSTGRES_DB: ${DB_DATABASE}
     volumes:
       - pgdata:/var/lib/postgresql
-      - ./note-app-backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./notes-app-backend/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_DATABASE}"]
       interval: 5s
@@ -16,7 +16,7 @@ services:
       retries: 5
 
   backend:
-    build: ./note-app-backend
+    build: ./notes-app-backend
     restart: unless-stopped
     environment:
       PORT: 3000
@@ -34,7 +34,7 @@ services:
 
   frontend:
     build:
-      context: ./note-app-frontend
+      context: ./notes-app-frontend
       args:
         VITE_API_URL: /api
     restart: unless-stopped
