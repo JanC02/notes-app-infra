@@ -1,49 +1,42 @@
 services:
-  db:
-    image: postgres:18.1
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_DATABASE}
+  notes-app-db:
+    image: "postgres:18"
+    networks:
+      - notes-app
+    env_file:
+      - ./db.env
     volumes:
       - pgdata:/var/lib/postgresql
-      - ./notes-app-backend/init.sql:/docker-entrypoint-initdb.d/init.sql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_DATABASE}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  backend:
-    build: ./notes-app-backend
-    restart: unless-stopped
-    environment:
-      PORT: 3000
-      CORS_ORIGIN: ${CORS_ORIGIN}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_DATABASE: ${DB_DATABASE}
-      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
-      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
-    depends_on:
-      db:
-        condition: service_healthy
-
-  frontend:
-    build:
-      context: ./notes-app-frontend
-      args:
-        VITE_API_URL: /api
-    restart: unless-stopped
+      - "./notes-app-backend/init.sql:/docker-entrypoint-initdb.d/init.sql"
     ports:
-      - "30155:80"
+      - "5432:5432"
+  
+  notes-app-backend:
+    build: ./notes-app-backend
+    env_file:
+      - ./notes-app-backend/.env
+    networks:
+      - notes-app
     volumes:
-      - ./.htpasswd:/etc/nginx/.htpasswd:ro
+      - ./notes-app-backend:/app
+      - /app/node_modules
     depends_on:
-      - backend
-
+      - notes-app-db
+    ports:
+      - "3000:3000"
+    
+  notes-app-frontend:
+    build: ./notes-app-frontend
+    env_file:
+      - ./notes-app-frontend/.env
+    volumes:
+      - "./notes-app-frontend:/app"
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - notes-app-backend
+networks:
+  notes-app:
 volumes:
   pgdata:
