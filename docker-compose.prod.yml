@@ -8,38 +8,28 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql
       - "./notes-app-backend/init.sql:/docker-entrypoint-initdb.d/init.sql"
-    ports:
-      - "5432:5432"
   
   notes-app-backend:
     build:
       context: ./notes-app-backend
-      target: dev
+      target: prod
     env_file:
       - ./notes-app-backend/.env
     networks:
       - notes-app
-    volumes:
-      - ./notes-app-backend:/app
-      - /app/node_modules
     depends_on:
       - notes-app-db
-    ports:
-      - "3000:3000"
     
   notes-app-frontend:
     build:
       context: ./notes-app-frontend
-      target: dev
-    volumes:
-      - "./notes-app-frontend:/app"
-      - /app/node_modules
+      target: prod
     ports:
-      - "5173:5173"
-    networks:
-      - notes-app
+      - "80:80"
     depends_on:
       - notes-app-backend
+    networks:
+      - notes-app
 networks:
   notes-app:
 volumes:
