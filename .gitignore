@@ -1,4 +1,5 @@
 .env
 .htpasswd
-note-app-frontend/
-note-app-backend/
+notes-app-frontend/
+notes-app-backend/
+db.env
