@@ -26,6 +26,8 @@ services:
       - notes-app-db
     ports:
       - "3000:3000"
+    environment:
+      NODE_ENV: development
     
   notes-app-frontend:
     build:

@@ -19,6 +19,8 @@ services:
       - notes-app
     depends_on:
       - notes-app-db
+    environment:
+      NODE_ENV: production
     
   notes-app-frontend:
     build:
